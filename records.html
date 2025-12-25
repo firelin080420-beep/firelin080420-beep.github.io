@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>区域到访记录 - 记录列表</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/records.css">
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <header class="bg-white shadow-md p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <button id="backToMapBtn" class="mr-4 text-blue-600 hover:text-blue-800">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                </button>
+                <h1 class="text-xl font-bold text-blue-600">到访记录列表</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span id="userName" class="text-gray-700"></span>
+                <button id="logoutBtn" class="text-red-500 hover:text-red-700">退出登录</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow p-4">
+        <div class="container mx-auto">
+            <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+                <div class="flex flex-wrap items-center justify-between">
+                    <h2 class="text-lg font-semibold mb-2 md:mb-0">所有到访记录</h2>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-gray-600 mr-2">排序方式:</span>
+                        <select id="sortSelect" class="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="date-desc">日期从新到旧</option>
+                            <option value="date-asc">日期从旧到新</option>
+                            <option value="name-asc">名称A-Z</option>
+                            <option value="name-desc">名称Z-A</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="recordsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- 记录卡片将通过JavaScript动态加载 -->
+                <div id="noRecordsMessage" class="col-span-full text-center py-12">
+                    <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <p class="text-gray-500">暂无到访记录</p>
+                    <p class="text-gray-400 text-sm mt-2">前往地图页面标记您的首次到访吧！</p>
+                    <button id="goToMapFromEmptyBtn" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200">
+                        前往地图
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 照片预览弹窗 -->
+    <div id="photoViewerModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 hidden">
+        <div class="relative w-full max-w-4xl p-4">
+            <button id="closePhotoViewerBtn" class="absolute top-2 right-2 text-white hover:text-gray-300 z-10">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+            
+            <div id="photoViewerContent" class="bg-black rounded-lg overflow-hidden">
+                <img id="photoViewerImage" class="w-full h-auto max-h-[80vh]" src="" alt="预览照片">
+            </div>
+            
+            <div class="flex justify-center mt-4 space-x-2">
+                <button id="prevPhotoBtn" class="px-3 py-1 bg-white bg-opacity-20 text-white rounded-md hover:bg-opacity-30 transition duration-200">
+                    上一张
+                </button>
+                <span id="photoCounter" class="text-white self-center">1 / 5</span>
+                <button id="nextPhotoBtn" class="px-3 py-1 bg-white bg-opacity-20 text-white rounded-md hover:bg-opacity-30 transition duration-200">
+                    下一张
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="data/map-data-simple.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/records.js"></script>
+</body>
+</html>

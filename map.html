@@ -1,0 +1,156 @@
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>区域到访记录 - 地图</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/map.css">
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <header class="bg-white shadow-md p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold text-blue-600">火火发发GOGOGO</h1>
+            <div class="flex items-center space-x-4">
+                <span id="userName" class="text-gray-700"></span>
+                <button id="logoutBtn" class="text-red-500 hover:text-red-700">退出登录</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex flex-col md:flex-row p-4">
+        <div class="w-full md:w-3/4 bg-white rounded-lg shadow-md p-4 mb-4 md:mb-0 md:mr-4">
+            <div class="relative">
+                <svg id="mapSvg" class="w-full" viewBox="0 0 850 520" preserveAspectRatio="xMidYMid meet">
+                    <!-- 地图将通过JavaScript动态加载 -->
+                </svg>
+                <div id="mapLegend" class="absolute top-4 right-4 bg-white bg-opacity-80 p-3 rounded-md shadow-md">
+                    <h3 class="font-bold text-sm mb-2">图例</h3>
+                    <div class="flex items-center mb-1">
+                        <div class="w-4 h-4 bg-blue-100 border border-blue-500 mr-2"></div>
+                        <span class="text-xs">未到访</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-yellow-400 border border-yellow-600 mr-2"></div>
+                        <span class="text-xs">已到访</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-full md:w-1/4 flex flex-col space-y-4">
+            <div class="bg-white rounded-lg shadow-md p-4">
+                <h2 class="text-lg font-semibold mb-3">到访统计</h2>
+                <div class="space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">已到访区域:</span>
+                        <span id="visitedCount" class="font-bold">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">总区域数:</span>
+                        <span id="totalCount" class="font-bold">0</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                        <div id="progressBar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-4">
+                <h2 class="text-lg font-semibold mb-3">快速导航</h2>
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="toRecordsBtn" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200">
+                        查看记录
+                    </button>
+                    <button id="resetViewBtn" class="bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition duration-200">
+                        重置视图
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 区域记录弹窗 -->
+    <div id="recordModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">记录到访信息</h2>
+                <button id="closeModalBtn" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="recordForm">
+                <input type="hidden" id="regionId">
+                
+                <div class="mb-4">
+                    <label for="regionName" class="block text-sm font-medium text-gray-700 mb-1">区域名称</label>
+                    <input type="text" id="regionName" class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100" readonly="">
+                </div>
+                
+                <div class="mb-4">
+                    <label for="visitDate" class="block text-sm font-medium text-gray-700 mb-1">到访日期</label>
+                    <input type="date" id="visitDate" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required="">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">照片上传</label>
+                    <div id="photoUploadArea" class="border-2 border-dashed border-gray-300 rounded-md p-4 text-center cursor-pointer hover:border-blue-500 transition duration-200">
+                        <input type="file" id="photoInput" class="hidden" accept="image/*" multiple="">
+                        <svg class="w-12 h-12 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <p class="text-sm text-gray-600">点击或拖拽照片到此处上传</p>
+                        <p class="text-xs text-gray-500 mt-1">支持JPG、PNG格式，最多5张</p>
+                    </div>
+                </div>
+                
+                <div id="photoPreviewArea" class="mb-4 hidden">
+                    <h3 class="text-sm font-medium text-gray-700 mb-2">已选择的照片</h3>
+                    <div id="photoPreviews" class="grid grid-cols-3 gap-2"></div>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="cancelRecordBtn" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition duration-200">
+                        取消
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200">
+                        提交记录
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 照片预览弹窗 -->
+    <div id="photoViewerModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 hidden">
+        <div class="relative w-full max-w-4xl p-4">
+            <button id="closePhotoViewerBtn" class="absolute top-2 right-2 text-white hover:text-gray-300 z-10">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+            
+            <div id="photoViewerContent" class="bg-black rounded-lg overflow-hidden">
+                <img id="photoViewerImage" class="w-full h-auto max-h-[80vh]" src="" alt="预览照片">
+            </div>
+            
+            <div class="flex justify-center mt-4 space-x-2">
+                <button id="prevPhotoBtn" class="px-3 py-1 bg-white bg-opacity-20 text-white rounded-md hover:bg-opacity-30 transition duration-200">
+                    上一张
+                </button>
+                <span id="photoCounter" class="text-white self-center">1 / 5</span>
+                <button id="nextPhotoBtn" class="px-3 py-1 bg-white bg-opacity-20 text-white rounded-md hover:bg-opacity-30 transition duration-200">
+                    下一张
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="data/map-data-simple.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/map.js"></script>
+
+</body></html>

@@ -1,0 +1,196 @@
+/* 地图样式 */
+#mapSvg {
+    border-radius: 0.375rem;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 地图区域样式 */
+.map-region {
+    fill: #EBF5FF;
+    stroke: #2563EB;
+    stroke-width: 1;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.map-region:hover {
+    fill: #DBEAFE;
+    stroke-width: 2;
+}
+
+.map-region.visited {
+    fill: #FBBF24;
+    stroke: #D97706;
+}
+
+.map-region.visited:hover {
+    fill: #F59E0B;
+}
+
+/* 区域名称标签 */
+.region-label {
+    font-size: 12px;
+    fill: #1E40AF;
+    text-anchor: middle;
+    pointer-events: none;
+    font-weight: 500;
+}
+
+/* 区域点亮动画 */
+@keyframes lightUp {
+    0% {
+        fill: #EBF5FF;
+        filter: brightness(1);
+    }
+    50% {
+        fill: #FEF3C7;
+        filter: brightness(1.2);
+    }
+    100% {
+        fill: #FBBF24;
+        filter: brightness(1);
+    }
+}
+
+.map-region.light-up-animation {
+    animation: lightUp 1.5s ease-in-out forwards;
+}
+
+/* 弹窗样式 */
+#recordModal {
+    backdrop-filter: blur(4px);
+}
+
+#recordModal .modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* 照片上传区域 */
+#photoUploadArea {
+    min-height: 120px;
+    transition: all 0.3s ease;
+}
+
+#photoUploadArea.dragover {
+    border-color: #3b82f6;
+    background-color: rgba(59, 130, 246, 0.05);
+}
+
+/* 照片预览样式 */
+.photo-preview {
+    position: relative;
+    width: 100%;
+    padding-top: 100%; /* 1:1 宽高比 */
+    overflow: hidden;
+    border-radius: 0.25rem;
+    background-color: #f3f4f6;
+}
+
+.photo-preview img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.photo-preview .remove-photo {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 10px;
+    transition: all 0.2s ease;
+}
+
+.photo-preview .remove-photo:hover {
+    background-color: rgba(220, 38, 38, 0.8);
+}
+
+/* 照片查看器样式 */
+#photoViewerModal {
+    backdrop-filter: blur(8px);
+}
+
+#photoViewerImage {
+    max-width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .map-container {
+        height: 50vh;
+    }
+    
+    .region-label {
+        font-size: 10px;
+    }
+    
+    #mapLegend {
+        position: relative;
+        top: 0;
+        right: 0;
+        margin-top: 1rem;
+        width: 100%;
+    }
+}
+
+/* 地图控制按钮 */
+.map-controls {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.map-control-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.map-control-btn:hover {
+    background-color: #f3f4f6;
+    transform: scale(1.05);
+}
+
+/* 区域信息提示 */
+.region-tooltip {
+    position: absolute;
+    background-color: white;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    font-size: 0.875rem;
+    pointer-events: none;
+    z-index: 10;
+    max-width: 200px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.region-tooltip.visible {
+    opacity: 1;
+}

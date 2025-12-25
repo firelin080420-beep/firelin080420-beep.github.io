@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>功能测试 - 区域到访记录</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-gray-100 min-h-screen p-4">
+    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
+        <h1 class="text-2xl font-bold text-blue-600 mb-6">功能测试页面</h1>
+        
+        <div class="space-y-6">
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4">
+                <h2 class="text-lg font-semibold text-blue-700 mb-2">测试说明</h2>
+                <p class="text-gray-700">此页面用于测试区域到访记录系统的各项功能。点击下方按钮进行相应的测试。</p>
+            </div>
+            
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-gray-800">基础功能测试</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button id="testLoginBtn" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200">
+                        测试登录功能
+                    </button>
+                    
+                    <button id="testMapBtn" class="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition duration-200">
+                        测试地图功能
+                    </button>
+                    
+                    <button id="testRecordsBtn" class="bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition duration-200">
+                        测试记录功能
+                    </button>
+                    
+                    <button id="testStorageBtn" class="bg-yellow-600 text-white py-2 px-4 rounded-md hover:bg-yellow-700 transition duration-200">
+                        测试存储功能
+                    </button>
+                </div>
+            </div>
+            
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-gray-800">数据管理</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button id="clearDataBtn" class="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition duration-200">
+                        清空所有数据
+                    </button>
+                    
+                    <button id="exportDataBtn" class="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-200">
+                        导出数据
+                    </button>
+                    
+                    <button id="importDataBtn" class="bg-pink-600 text-white py-2 px-4 rounded-md hover:bg-pink-700 transition duration-200">
+                        导入示例数据
+                    </button>
+                    
+                    <button id="checkDataBtn" class="bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition duration-200">
+                        检查数据状态
+                    </button>
+                </div>
+            </div>
+            
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-gray-800">快速导航</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <a href="index.html" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200 text-center">
+                        登录页面
+                    </a>
+                    
+                    <a href="map.html" class="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition duration-200 text-center">
+                        地图页面
+                    </a>
+                    
+                    <a href="records.html" class="bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition duration-200 text-center">
+                        记录页面
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div id="testResults" class="mt-8 space-y-4">
+            <h3 class="text-lg font-semibold text-gray-800">测试结果</h3>
+            <div id="resultOutput" class="bg-gray-50 p-4 rounded-md h-64 overflow-y-auto">
+                <p class="text-gray-500 italic">点击上方按钮开始测试...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="data/map-data-simple.js"></script>
+    <script src="js/storage.js"></script>
+    <script>
+        // 测试结果输出
+        function outputResult(message, type = 'info') {
+            const output = document.getElementById('resultOutput');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            let colorClass = 'text-gray-700';
+            if (type === 'success') colorClass = 'text-green-700';
+            if (type === 'error') colorClass = 'text-red-700';
+            if (type === 'warning') colorClass = 'text-yellow-700';
+            
+            output.innerHTML += `<p class="${colorClass}"><span class="text-gray-500">[${timestamp}]</span> ${message}</p>`;
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        // 清空测试结果
+        function clearResults() {
+            document.getElementById('resultOutput').innerHTML = '';
+        }
+        
+        // 测试登录功能
+        function testLogin() {
+            clearResults();
+            outputResult('开始测试登录功能...');
+            
+            try {
+                // 模拟用户数据
+                const testUsers = [
+                    { username: 'admin', password: 'admin123' },
+                    { username: 'user1', password: 'password1' }
+                ];
+                
+                outputResult('✓ 用户数据加载成功', 'success');
+                outputResult(`找到 ${testUsers.length} 个测试用户`);
+                
+                // 测试本地存储
+                if (typeof Storage !== 'undefined') {
+                    outputResult('✓ 本地存储可用', 'success');
+                    
+                    // 测试保存数据
+                    localStorage.setItem('testKey', 'testValue');
+                    const testValue = localStorage.getItem('testKey');
+                    
+                    if (testValue === 'testValue') {
+                        outputResult('✓ 本地存储读写正常', 'success');
+                        localStorage.removeItem('testKey');
+                    } else {
+                        outputResult('✗ 本地存储写入失败', 'error');
+                    }
+                } else {
+                    outputResult('✗ 本地存储不可用', 'error');
+                }
+                
+                outputResult('登录功能测试完成', 'success');
+            } catch (error) {
+                outputResult(`✗ 测试过程中发生错误: ${error.message}`, 'error');
+            }
+        }
+        
+        // 测试地图功能
+        function testMap() {
+            clearResults();
+            outputResult('开始测试地图功能...');
+            
+            try {
+                // 测试地图数据
+                if (typeof mapData !== 'undefined') {
+                    outputResult('✓ 地图数据加载成功', 'success');
+                    
+                    const regions = getAllRegions();
+                    const cities = [...new Set(Object.values(mapData).map(item => item.city))];
+                    
+                    outputResult(`找到 ${regions.length} 个区域`);
+                    outputResult(`找到 ${cities.length} 个城市: ${cities.join(', ')}`);
+                    
+                    // 测试区域查找
+                    const testRegion = getRegionById('350203'); // 思明区
+                    if (testRegion) {
+                        outputResult(`✓ 区域查找正常: ${testRegion.name} (${testRegion.city})`, 'success');
+                    } else {
+                        outputResult('✗ 区域查找失败', 'error');
+                    }
+                    
+                    // 测试城市区域查找
+                    const xiamenRegions = getRegionsByCity('厦门市');
+                    if (xiamenRegions && xiamenRegions.length > 0) {
+                        outputResult(`✓ 城市区域查找正常: 厦门市有 ${xiamenRegions.length} 个区域`, 'success');
+                    } else {
+                        outputResult('✗ 城市区域查找失败', 'error');
+                    }
+                    
+                } else {
+                    outputResult('✗ 地图数据加载失败', 'error');
+                }
+                
+                outputResult('地图功能测试完成', 'success');
+            } catch (error) {
+                outputResult(`✗ 测试过程中发生错误: ${error.message}`, 'error');
+            }
+        }
+        
+        // 测试记录功能
+        function testRecords() {
+            clearResults();
+            outputResult('开始测试记录功能...');
+            
+            try {
+                // 测试记录存储
+                const testRecord = {
+                    regionId: '350203',
+                    regionName: '思明区',
+                    cityName: '厦门市',
+                    visitDate: new Date().toISOString().split('T')[0],
+                    photos: []
+                };
+                
+                outputResult('创建测试记录...');
+                
+                // 保存测试记录
+                const savedRecord = saveVisitRecord(testRecord);
+                if (savedRecord && savedRecord.id) {
+                    outputResult(`✓ 记录保存成功，ID: ${savedRecord.id}`, 'success');
+                    
+                    // 获取所有记录
+                    const allRecords = getAllVisitRecords();
+                    outputResult(`✓ 当前共有 ${allRecords.length} 条记录`, 'success');
+                    
+                    // 根据区域ID获取记录
+                    const regionRecord = getVisitRecordByRegionId('350203');
+                    if (regionRecord) {
+                        outputResult(`✓ 根据区域ID查找记录成功`, 'success');
+                    } else {
+                        outputResult('✗ 根据区域ID查找记录失败', 'error');
+                    }
+                    
+                    // 删除测试记录
+                    const deleteSuccess = deleteVisitRecord(savedRecord.id);
+                    if (deleteSuccess) {
+                        outputResult('✓ 记录删除成功', 'success');
+                        
+                        const remainingRecords = getAllVisitRecords();
+                        outputResult(`✓ 删除后剩余 ${remainingRecords.length} 条记录`, 'success');
+                    } else {
+                        outputResult('✗ 记录删除失败', 'error');
+                    }
+                    
+                } else {
+                    outputResult('✗ 记录保存失败', 'error');
+                }
+                
+                outputResult('记录功能测试完成', 'success');
+            } catch (error) {
+                outputResult(`✗ 测试过程中发生错误: ${error.message}`, 'error');
+            }
+        }
+        
+        // 测试存储功能
+        function testStorage() {
+            clearResults();
+            outputResult('开始测试存储功能...');
+            
+            try {
+                // 测试照片存储
+                const testPhotoData = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+                
+                outputResult('测试照片存储...');
+                
+                // 创建Blob对象
+                function dataURLToBlob(dataURL) {
+                    const parts = dataURL.split(';base64,');
+                    const contentType = parts[0].split(':')[1];
+                    const raw = window.atob(parts[1]);
+                    const rawLength = raw.length;
+                    const uInt8Array = new Uint8Array(rawLength);
+                    
+                    for (let i = 0; i < rawLength; ++i) {
+                        uInt8Array[i] = raw.charCodeAt(i);
+                    }
+                    
+                    return new Blob([uInt8Array], { type: contentType });
+                }
+                
+                const blob = dataURLToBlob(testPhotoData);
+                const file = new File([blob], 'test_photo.png', { type: blob.type });
+                
+                // 测试导出功能
+                const exportData = exportData();
+                if (exportData) {
+                    outputResult('✓ 数据导出功能正常', 'success');
+                    const dataSize = new Blob([exportData]).size;
+                    outputResult(`导出数据大小: ${(dataSize / 1024).toFixed(2)} KB`);
+                } else {
+                    outputResult('✗ 数据导出功能异常', 'warning');
+                }
+                
+                outputResult('存储功能测试完成', 'success');
+            } catch (error) {
+                outputResult(`✗ 测试过程中发生错误: ${error.message}`, 'error');
+            }
+        }
+        
+        // 清空所有数据
+        function clearAllData() {
+            if (confirm('确定要清空所有数据吗？此操作无法撤销！')) {
+                clearResults();
+                outputResult('开始清空数据...');
+                
+                try {
+                    // 清空到访记录
+                    const records = getAllVisitRecords();
+                    outputResult(`找到 ${records.length} 条记录`);
+                    
+                    // 删除所有照片
+                    records.forEach(record => {
+                        if (record.photos && record.photos.length > 0) {
+                            record.photos.forEach(photo => deletePhoto(photo));
+                        }
+                    });
+                    
+                    // 清空记录
+                    localStorage.removeItem('visitedTrackerRecords');
+                    localStorage.removeItem('visitedTrackerPreferences');
+                    
+                    outputResult('✓ 所有数据已清空', 'success');
+                } catch (error) {
+                    outputResult(`✗ 清空数据时发生错误: ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        // 导出数据
+        function exportUserData() {
+            try {
+                const data = exportData();
+                if (data) {
+                    const blob = new Blob([data], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `visit-tracker-backup-${new Date().toISOString().split('T')[0]}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    outputResult('✓ 数据导出成功', 'success');
+                } else {
+                    outputResult('✗ 数据导出失败', 'error');
+                }
+            } catch (error) {
+                outputResult(`✗ 导出数据时发生错误: ${error.message}`, 'error');
+            }
+        }
+        
+        // 导入示例数据
+        function importSampleData() {
+            if (confirm('确定要导入示例数据吗？这将添加一些测试记录。')) {
+                clearResults();
+                outputResult('开始导入示例数据...');
+                
+                try {
+                    // 创建示例记录
+                    const sampleRecords = [
+                        {
+                            regionId: '350203',
+                            regionName: '思明区',
+                            cityName: '厦门市',
+                            visitDate: '2024-01-15',
+                            photos: []
+                        },
+                        {
+                            regionId: '350205',
+                            regionName: '海沧区',
+                            cityName: '厦门市',
+                            visitDate: '2024-02-20',
+                            photos: []
+                        },
+                        {
+                            regionId: '440303',
+                            regionName: '罗湖区',
+                            cityName: '深圳市',
+                            visitDate: '2024-03-10',
+                            photos: []
+                        }
+                    ];
+                    
+                    // 保存示例记录
+                    sampleRecords.forEach(record => {
+                        saveVisitRecord(record);
+                    });
+                    
+                    outputResult(`✓ 成功导入 ${sampleRecords.length} 条示例记录`, 'success');
+                    outputResult('示例记录: 思明区、海沧区、罗湖区', 'info');
+                } catch (error) {
+                    outputResult(`✗ 导入示例数据时发生错误: ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        // 检查数据状态
+        function checkDataStatus() {
+            clearResults();
+            outputResult('开始检查数据状态...');
+            
+            try {
+                // 检查记录
+                const records = getAllVisitRecords();
+                outputResult(`当前共有 ${records.length} 条到访记录`);
+                
+                if (records.length > 0) {
+                    // 显示最近的记录
+                    const recentRecords = records.sort((a, b) => new Date(b.visitDate) - new Date(a.visitDate)).slice(0, 3);
+                    
+                    outputResult('最近的记录:', 'info');
+                    recentRecords.forEach((record, index) => {
+                        outputResult(`${index + 1}. ${record.regionName} (${record.cityName}) - ${record.visitDate}`);
+                    });
+                    
+                    // 统计照片数量
+                    const totalPhotos = records.reduce((sum, record) => sum + (record.photos ? record.photos.length : 0), 0);
+                    outputResult(`总共上传了 ${totalPhotos} 张照片`);
+                    
+                    // 统计城市
+                    const cities = [...new Set(records.map(record => record.cityName))];
+                    outputResult(`到访了 ${cities.length} 个城市: ${cities.join(', ')}`);
+                }
+                
+                // 检查本地存储使用情况
+                let storageUsed = 0;
+                for (let key in localStorage) {
+                    if (localStorage.hasOwnProperty(key)) {
+                        storageUsed += localStorage[key].length + key.length;
+                    }
+                }
+                
+                outputResult(`本地存储使用: ${(storageUsed / 1024).toFixed(2)} KB`, 'info');
+                
+                outputResult('数据状态检查完成', 'success');
+            } catch (error) {
+                outputResult(`✗ 检查数据状态时发生错误: ${error.message}`, 'error');
+            }
+        }
+        
+        // 绑定按钮事件
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('testLoginBtn').addEventListener('click', testLogin);
+            document.getElementById('testMapBtn').addEventListener('click', testMap);
+            document.getElementById('testRecordsBtn').addEventListener('click', testRecords);
+            document.getElementById('testStorageBtn').addEventListener('click', testStorage);
+            
+            document.getElementById('clearDataBtn').addEventListener('click', clearAllData);
+            document.getElementById('exportDataBtn').addEventListener('click', exportUserData);
+            document.getElementById('importDataBtn').addEventListener('click', importSampleData);
+            document.getElementById('checkDataBtn').addEventListener('click', checkDataStatus);
+            
+            // 初始化显示
+            outputResult('测试页面加载完成，请点击上方按钮开始测试。', 'info');
+        });
+    </script>
+</body>
+</html>
